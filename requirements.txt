@@ -4,4 +4,4 @@ numpy
 matplotlib
 scikit-learn
 pydeck
-google-generativeai
+google
