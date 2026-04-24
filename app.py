@@ -118,7 +118,7 @@ if points:
 st.markdown("---")
 
 # ── PREDICTIVE AI SECTION ─────────────
-st.subheader("🔮 AI Risk Prediction")
+st.subheader("AI Risk Prediction")
 
 future_risk = df[df["predicted_risk"] > df["risk"]]
 
@@ -131,14 +131,14 @@ else:
 st.markdown("---")
 
 # ── ALERTS ────────────────────────────
-st.subheader("🚨 Disruption Alerts")
+st.subheader(" Disruption Alerts")
 
 st.dataframe(df[["id","from","to","risk","status"]])
 
 st.markdown("---")
 
 # ── AI DAILY BRIEFING (KEY FEATURE) ───
-st.subheader("🧠 AI Daily Briefing")
+st.subheader("AI Daily Briefing")
 
 if st.button("Generate Briefing"):
     summary = df.describe().to_string()
@@ -156,7 +156,7 @@ if st.button("Generate Briefing"):
 st.markdown("---")
 
 # ── FORECAST ──────────────────────────
-st.subheader("📈 Demand Forecast")
+st.subheader(" Demand Forecast")
 
 x=np.arange(1,20)
 y=200+x*5+np.random.normal(0,20,19)
