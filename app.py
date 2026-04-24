@@ -1,3 +1,7 @@
+"""
+ChainGuard AI — FINAL CLEAN VERSION (NO CRASH + CSV VALIDATION)
+"""
+
 import time
 import random
 import numpy as np
@@ -8,12 +12,11 @@ import streamlit as st
 from sklearn.linear_model import LinearRegression
 import google.generativeai as genai
 
-# ── CONFIG ─────────────────────────────
 st.set_page_config(page_title="ChainGuard AI", layout="wide")
 
-# ── GEMINI SETUP (CORRECT) ─────────────
+# ── GEMINI ─────────────────────────────
 if "GEMINI_API_KEY" not in st.secrets:
-    st.error("❌ Add GEMINI_API_KEY in secrets.toml")
+    st.error("❌ Please add GEMINI_API_KEY in Secrets")
     st.stop()
 
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
@@ -21,34 +24,27 @@ model = genai.GenerativeModel("gemini-1.5-flash")
 
 def safe_gemini(prompt):
     try:
-        response = model.generate_content(prompt)
-        return response.text
+        return model.generate_content(prompt).text
     except:
-        return """⚠️ AI Insight:
-• High disruption risk detected  
-• Suggest rerouting or buffer time  
-"""
+        return "⚠️ AI temporarily unavailable. Suggested: reroute or add buffer."
 
-# ── CITY COORDS ───────────────────────
+# ── CITY MAP ───────────────────────────
 CITY_COORDS = {
     "mumbai":[19.07,72.87],
     "delhi":[28.61,77.20],
     "chennai":[13.08,80.27],
     "bangalore":[12.97,77.59],
-    "shanghai":[31.23,121.47],
-    "rotterdam":[51.92,4.47],
 }
 
-# ── DATA ───────────────────────────────
+# ── DEMO DATA ─────────────────────────
 @st.cache_data
 def sim_data():
-    routes=[("mumbai","delhi"),("chennai","bangalore"),("shanghai","rotterdam")]
+    routes=[("mumbai","delhi"),("chennai","bangalore")]
     data=[]
-    for i in range(10):
+    for i in range(8):
         frm,to=random.choice(routes)
         risk=int(np.clip(np.random.normal(50,20),0,100))
         delay=int(risk/5)
-
         data.append({
             "id":f"SHP-{1000+i}",
             "from":frm,
@@ -59,15 +55,24 @@ def sim_data():
         })
     return pd.DataFrame(data)
 
-# ── CSV INPUT ──────────────────────────
-st.sidebar.header("📂 Upload Data")
+# ── CSV INPUT (SAFE) ───────────────────
+st.sidebar.header("📂 Upload CSV")
 file = st.sidebar.file_uploader("Upload CSV", type=["csv"])
 
 if file:
     df = pd.read_csv(file)
     df.columns = df.columns.str.lower()
 
+    # REQUIRED columns
+    required_cols = {"id", "from", "to"}
+
+    if not required_cols.issubset(df.columns):
+        st.error("❌ Invalid CSV format. Required columns: id, from, to")
+        st.stop()
+
+    # Optional fixes
     if "risk" not in df.columns:
+        st.warning("No 'risk' column → generating automatically")
         df["risk"] = np.random.randint(20,80,len(df))
 
     if "delay" not in df.columns:
@@ -80,6 +85,7 @@ if file:
     df["to"] = df["to"].str.lower()
 
     st.sidebar.success("Using uploaded data")
+
 else:
     df = sim_data()
     st.sidebar.info("Using demo data")
@@ -90,7 +96,6 @@ df["status"] = np.where(df["risk"]>=60,"CRITICAL",
 
 # ── UI ────────────────────────────────
 st.title("🛡️ ChainGuard AI")
-st.caption("AI-powered disruption detection system")
 
 # KPIs
 c1,c2,c3 = st.columns(3)
@@ -114,14 +119,15 @@ for _,s in df.iterrows():
         })
 
 if arcs:
-    layer=pdk.Layer(
+    st.pydeck_chart(pdk.Deck(layers=[pdk.Layer(
         "ArcLayer",
         data=arcs,
         get_source_position=["from_lon","from_lat"],
         get_target_position=["to_lon","to_lat"],
         get_width=3,
-    )
-    st.pydeck_chart(pdk.Deck(layers=[layer]))
+    )]))
+else:
+    st.info("Map unavailable for given locations")
 
 st.markdown("---")
 
@@ -131,28 +137,24 @@ st.subheader("🚨 Disruption Alerts")
 filter_status = st.selectbox("Filter", ["All","CRITICAL","AT RISK","ON TRACK"])
 view = df if filter_status=="All" else df[df["status"]==filter_status]
 
-st.dataframe(view[["id","from","to","risk","delay","eta","status"]],
-             use_container_width=True)
+st.dataframe(view, use_container_width=True)
 
-# AI INSIGHT (CLEAR + FIXED)
+# AI
 st.markdown("### 🧠 AI Insight")
 
 selected = st.selectbox("Select Shipment", view["id"])
 
 if st.button("Generate Insight"):
     row = view[view["id"]==selected].iloc[0]
-
     with st.spinner("Analyzing..."):
-        result = safe_gemini(
-            f"Shipment from {row['from']} to {row['to']} has risk {row['risk']}. Suggest action."
-        )
-
-    st.success(result)
+        st.success(safe_gemini(
+            f"Shipment from {row['from']} to {row['to']} risk {row['risk']}. Suggest action."
+        ))
 
 st.markdown("---")
 
 # FORECAST
-st.subheader("📈 Demand Forecast")
+st.subheader("📈 Forecast")
 
 x=np.arange(1,20)
 y=200+x*5+np.random.normal(0,20,19)
