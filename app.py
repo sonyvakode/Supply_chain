@@ -1,7 +1,3 @@
-"""
-ChainGuard AI — FINAL MOBILE FRIENDLY + DARK MODE
-"""
-
 import time
 import random
 import numpy as np
