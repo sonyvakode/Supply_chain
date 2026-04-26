@@ -133,7 +133,7 @@ streamlit run app.py
 ## ⚠️ Limitations
 
 * Uses simulated data (not real-time streaming)
-* Routing optimization is AI-assisted (not algorithmic)
+* Routing optimization is AI-assisted (not fully algorithmic)
 * Prototype-level scalability
 
 ---
@@ -147,3 +147,11 @@ streamlit run app.py
 
 ---
 
+## 👥 Team
+
+**Team Name:** Navdashi
+
+* 👨‍💻 **Sony Vakode** — Team Leader
+* 👩‍💻 **Meddipally Shruthi** — Team Member
+
+---
