@@ -211,9 +211,9 @@ st.divider()
 # ── KPI CARDS ──────────────────────────────────────────────────────────────────
 k1, k2, k3, k4 = st.columns(4)
 k1.metric("📦 Total Shipments", len(df_view))
-k2.metric("🔴 Critical",        int((df_view["risk"] >= 60).sum()))
-k3.metric("🟡 At Risk",         int(((df_view["risk"] >= 30) & (df_view["risk"] < 60)).sum()))
-k4.metric("💰 Total Cost",      f"₹{df_view['cost'].sum():,.0f}")
+k2.metric(" Critical",        int((df_view["risk"] >= 60).sum()))
+k3.metric(" At Risk",         int(((df_view["risk"] >= 30) & (df_view["risk"] < 60)).sum()))
+k4.metric(" Total Cost",      f"₹{df_view['cost'].sum():,.0f}")
 
 st.divider()
 
