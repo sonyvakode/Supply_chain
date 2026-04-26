@@ -20,7 +20,7 @@ It delivers a **real-time simulation dashboard** with:
 ## 🔗 Project Links
 
 * **Working Prototype (Code + Documentation):**
-  https://github.com/sonyvakoode/Supply_chain
+   (https://github.com/sonyvakode/Supply_chain)
 
 * **MVP (Deployed Application):**
   https://smartsupplychain.streamlit.app/
