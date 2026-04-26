@@ -191,7 +191,7 @@ with st.sidebar:
         ["CRITICAL", "AT RISK", "ON TRACK"],
         default=["CRITICAL", "AT RISK", "ON TRACK"]
     )
-    auto_mode = st.toggle("🔴 Live Simulation (auto-refresh)", value=False)
+    auto_mode = st.toggle("Live Simulation (auto-refresh)", value=False)
     st.caption("Simulates real-time data updates every 3s")
 
     st.divider()
@@ -218,14 +218,14 @@ k4.metric("💰 Total Cost",      f"₹{df_view['cost'].sum():,.0f}")
 st.divider()
 
 # ── OPTIMIZATION PANEL ─────────────────────────────────────────────────────────
-st.subheader("⚡ Smart Network Optimization")
+st.subheader("Smart Network Optimization")
 
 before_cost = df["cost"].sum()
 before_risk = df["risk"].mean()
 
 col_btn, col_info = st.columns([1, 3])
 with col_btn:
-    optimize = st.button("🚀 Optimize Network", type="primary", use_container_width=True)
+    optimize = st.button(" Optimize Network", type="primary", use_container_width=True)
 
 with col_info:
     if not st.session_state.optimized:
@@ -390,7 +390,7 @@ plt.close(fig2)
 st.divider()
 
 # ── RISK DISTRIBUTION ──────────────────────────────────────────────────────────
-st.subheader("🎯 Risk Distribution")
+st.subheader(" Risk Distribution")
 fig3, ax3 = plt.subplots(figsize=(8, 3))
 ax3.hist(df_view["risk"], bins=15, color="#2563eb", edgecolor="#0d1b2a", alpha=0.85)
 ax3.axvline(30, color="#ffa500", linestyle="--", linewidth=1.5, label="AT RISK threshold")
