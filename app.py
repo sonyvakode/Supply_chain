@@ -31,7 +31,7 @@ st.markdown("""
 # ── GEMINI SETUP ───────────────────────────────────────────────────────────────
 try:
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-    gemini = genai.GenerativeModel("gemini-1.5-flash")
+    gemini = genai.GenerativeModel("gemini-2.0-flash")
     GEMINI_OK = True
 except Exception:
     GEMINI_OK = False
