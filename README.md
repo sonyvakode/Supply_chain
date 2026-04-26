@@ -6,48 +6,61 @@
 
 ## 🚀 Overview
 
-ChainGuard AI is an **interactive Streamlit-based prototype** that monitors shipment risks, predicts disruptions, and recommends optimized logistics decisions using AI.
+ChainGuard AI is an **interactive Streamlit-based working prototype and MVP** that monitors shipment risks, predicts disruptions, and provides optimized logistics decisions using AI.
 
-It provides a **real-time simulation dashboard** with:
+It delivers a **real-time simulation dashboard** with:
 
-* Risk scoring
-* Route optimization
-* AI insights
-* Demand forecasting
+* 📊 Risk scoring
+* ⚡ Route optimization
+* 🤖 AI-powered insights
+* 📈 Demand forecasting
+
+---
+
+## 🔗 Project Links
+
+* **Working Prototype (Code + Documentation):**
+  https://github.com/sonyvakoode/Supply_chain
+
+* **MVP (Deployed Application):**
+  https://smartsupplychain.streamlit.app/
+
+* **Demo Video (3 Minutes):**
+  https://youtube.com/smartflow-ai-demo
 
 ---
 
 ## 🎯 Problem Statement
 
-Supply chains are highly vulnerable to disruptions such as:
+Modern supply chains are highly vulnerable to disruptions such as:
 
 * Port congestion
 * Weather conditions
 * Operational delays
 
-Most systems are **reactive**, identifying issues only after delays occur, leading to:
+Most systems are **reactive**, identifying issues only after disruptions occur, leading to:
 
 * Increased logistics cost
-* Missed delivery timelines
-* Poor decision-making
+* Delivery delays
+* Inefficient decision-making
 
 ---
 
 ## 💡 Solution
 
-ChainGuard AI enables **proactive decision-making** by:
+ChainGuard AI enables **proactive supply chain management** by:
 
 * 📊 Monitoring shipment risk scores (0–100)
 * 🚨 Detecting critical shipments in real-time
 * ⚡ Optimizing routes dynamically
-* 🤖 Providing AI-driven insights using Gemini API
+* 🤖 Providing AI-driven recommendations using Gemini API
 * 📈 Forecasting demand trends
 
 ---
 
 ## ⚙️ Key Features
 
-### 🔹 1. Smart Dashboard
+### 🔹 Smart Dashboard
 
 * KPI Cards:
 
@@ -59,17 +72,17 @@ ChainGuard AI enables **proactive decision-making** by:
 
 ---
 
-### 🔹 2. Live Simulation Mode
+### 🔹 Live Simulation Mode
 
-* Toggle-based **auto-refresh system**
-* Updates shipment data every 3 seconds
+* Toggle-based auto-refresh system
+* Updates data every 3 seconds
 * Simulates real-time logistics environment
 
 ---
 
-### 🔹 3. Network Flow Map
+### 🔹 Network Flow Map
 
-* Built using **PyDeck**
+* Built using PyDeck
 * Visualizes routes between cities
 * Color-coded status:
 
@@ -79,32 +92,29 @@ ChainGuard AI enables **proactive decision-making** by:
 
 ---
 
-### 🔹 4. Smart Optimization Engine
+### 🔹 Smart Optimization Engine
 
-* Detects high-risk shipments
-* Suggests better rerouting options
-* Reduces:
-
-  * Cost
-  * Risk
+* Identifies high-risk shipments
+* Suggests alternative routing strategies
+* Reduces cost and risk
 
 ---
 
-### 🔹 5. AI Insights (Gemini API)
+### 🔹 AI Insights (Gemini API)
 
-* Generates actionable business insights
+* Generates actionable recommendations
 * Analyzes:
 
-  * Risk level
+  * Risk
   * Delay
   * Route
   * Cost
 
 ---
 
-### 🔹 6. Shipment Insights Panel
+### 🔹 Shipment Insights Panel
 
-* Displays shipment-level details:
+* Displays:
 
   * Route
   * Status
@@ -114,19 +124,14 @@ ChainGuard AI enables **proactive decision-making** by:
 
 ---
 
-### 🔹 7. Demand Forecasting
+### 🔹 Demand Forecasting
 
-* Uses **Linear Regression**
-* Predicts future shipment demand
-* Displays:
-
-  * Historical trend
-  * Forecast curve
-  * Confidence band
+* Uses Linear Regression
+* Predicts future shipment demand trends
 
 ---
 
-### 🔹 8. Risk Distribution Analysis
+### 🔹 Risk Distribution Analysis
 
 * Histogram visualization
 * Threshold markers:
@@ -138,19 +143,17 @@ ChainGuard AI enables **proactive decision-making** by:
 
 ## 🧠 AI Integration
 
-ChainGuard uses **Google Gemini API** to:
+ChainGuard AI integrates with **Google Gemini API** to:
 
 * Analyze shipment conditions
 * Generate decision-support insights
-* Suggest optimization strategies
+* Recommend mitigation strategies
 
 ---
 
 ## 📂 Input Data Format
 
-Upload CSV file with:
-
-```csv
+```csv id="csv1"
 id,from,to,risk
 SHP-001,mumbai,delhi,72
 SHP-002,hyderabad,pune,45
@@ -169,45 +172,75 @@ SHP-002,hyderabad,pune,45
 * **Backend:** Python
 * **AI:** Google Gemini API
 * **Data Processing:** Pandas, NumPy
-* **Visualization:**
-
-  * PyDeck (Map)
-  * Matplotlib (Charts)
+* **Visualization:** PyDeck, Matplotlib
 * **ML Model:** Linear Regression
 
 ---
 
 ## ▶️ How to Run
 
-### 1. Install Dependencies
+### 1. Clone the Repository
 
-```bash
+```bash id="cmd1"
+git clone https://github.com/sonyvakoode/Supply_chain.git
+cd Supply_chain
+```
+
+---
+
+### 2. Install Dependencies
+
+```bash id="cmd2"
 pip install streamlit pandas numpy matplotlib scikit-learn pydeck google-generativeai
 ```
 
 ---
 
-### 2. Add Gemini API Key
+### 3. Configure Gemini API Key
 
-Create file:
+Create folder:
 
 ```
-.streamlit/secrets.toml
+.streamlit
+```
+
+Inside it create file:
+
+```
+secrets.toml
 ```
 
 Add:
 
-```
+```id="cmd3"
 GEMINI_API_KEY = "your_api_key_here"
 ```
 
 ---
 
-### 3. Run the App
+### 4. Run the Application
 
-```bash
+```bash id="cmd4"
 streamlit run app.py
 ```
+
+---
+
+### 5. Open in Browser
+
+```
+http://localhost:8501/
+```
+
+---
+
+### 6. Using the App
+
+* View KPIs and dashboard
+* Explore shipment routes on map
+* Click **AI button** for insights
+* Use **Optimize Network**
+* Enable **Live Simulation Mode**
 
 ---
 
@@ -223,9 +256,9 @@ streamlit run app.py
 
 ## ⚠️ Limitations
 
-* Uses **simulated data (not real-time APIs)**
-* Risk scoring includes synthetic variation
-* Route optimization is heuristic-based
+* Uses simulated data (not real-time APIs)
+* Depends on Gemini API quota availability
+* Prototype-level scalability
 
 ---
 
@@ -233,9 +266,9 @@ streamlit run app.py
 
 * Integration with real logistics APIs
 * Weather-based disruption prediction
-* Advanced ML models (time series, deep learning)
-* Real-time GPS shipment tracking
-* SaaS deployment
+* Advanced ML models (time-series, deep learning)
+* Real-time GPS tracking
+* Full SaaS deployment
 
 ---
 
@@ -243,7 +276,7 @@ streamlit run app.py
 
 **Team Name:** Navdashi
 
-* 👨‍💻 **Sony Vakode** — Team Leader
-* 👩‍💻 **Meddipally Shruthi** — Team Member
+* 👨‍💻 Sony Vakode — Team Leader
+* 👩‍💻 Meddipally Shruthi — Team Member
 
 ---
