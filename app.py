@@ -87,7 +87,7 @@ else:
     df = sim_data()
 
 # ── AUTO MODE ─────────────────────────
-auto_mode = st.sidebar.toggle("⚡ Auto Mode (Live Simulation)", value=False)
+auto_mode = st.sidebar.toggle(" Auto Mode (Live Simulation)", value=False)
 
 # apply smarter risk
 df["risk"] = df["risk"].apply(predict_risk)
@@ -127,7 +127,7 @@ c3.metric("Total Cost", f"{df['cost'].sum():.0f}")
 st.markdown("---")
 
 # ── OPTIMIZATION ──────────────────────
-st.subheader("⚡ Smart Optimization")
+st.subheader(" Smart Optimization")
 
 before_cost = df["cost"].sum()
 before_risk = df["risk"].mean()
