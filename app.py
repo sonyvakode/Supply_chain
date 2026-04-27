@@ -57,7 +57,11 @@ def ai_insight(row: pd.Series, cost_saved: float) -> str:
         f"Network Cost Saved After Optimization: ₹{cost_saved:.0f}\n\n"
         f"Be specific about this route and risk level. No generic advice."
     )
-    except Exception:
+   try:
+    res = gemini.generate_content(prompt)
+    return res.text
+
+except Exception:
     insights = []
 
     if row["risk"] >= 75:
@@ -90,7 +94,6 @@ def ai_insight(row: pd.Series, cost_saved: float) -> str:
         insights[1] = f"• Optimization can save ₹{int(cost_saved)} and reduce risk."
 
     return "\n".join(insights[:2])
-
 # ── CITY COORDINATES ───────────────────────────────────────────────────────────
 CITIES = {
     "mumbai":    [19.07, 72.87],
