@@ -38,43 +38,12 @@ except Exception:
 
 def ai_insight(row: pd.Series, cost_saved: float) -> str:
     """Rich Gemini prompt with full shipment context."""
-    
-    # ── SMART FALLBACK (REPLACES FAKE TEXT) ──
     if not GEMINI_OK:
-        insights = []
-
-        if row["risk"] >= 75:
-            insights.append(
-                f"• Critical disruption risk ({row['risk']}%) on {row['from'].title()} → {row['to'].title()} route. Immediate rerouting required."
-            )
-        elif row["risk"] >= 50:
-            insights.append(
-                f"• Elevated risk ({row['risk']}%). Proactive monitoring needed."
-            )
-        else:
-            insights.append(
-                f"• Low risk ({row['risk']}). Route is stable."
-            )
-
-        if row["delay"] >= 6:
-            insights.append(
-                f"• High delay risk ({row['delay']} days) may impact supply commitments."
-            )
-        elif row["delay"] >= 3:
-            insights.append(
-                f"• Moderate delay expected ({row['delay']} days)."
-            )
-        else:
-            insights.append(
-                f"• Delivery on schedule (ETA {row['eta']} days)."
-            )
-
-        if cost_saved > 0 and row["risk"] >= 50:
-            insights[1] = f"• Optimization can save ₹{int(cost_saved)} and reduce risk."
-
-        return "\n".join(insights[:2])
-
-    # ── ORIGINAL GEMINI (UNCHANGED) ──
+        return (
+            f"• Route {row['from'].title()} → {row['to'].title()} carries a "
+            f"{row['risk']}% risk score. Consider priority handling.\n"
+            f"• Optimizing this route could save ₹{cost_saved:.0f} in logistics cost."
+        )
     prompt = (
         f"You are a supply chain analyst. Analyze this shipment and give exactly 2 "
         f"short, specific, actionable business insights (bullet points).\n\n"
@@ -93,10 +62,6 @@ def ai_insight(row: pd.Series, cost_saved: float) -> str:
         return res.text
     except Exception as e:
         return f"• AI temporarily unavailable: {e}"
-
-
-# 🔻 EVERYTHING BELOW IS EXACTLY YOUR ORIGINAL CODE (UNCHANGED)
-# (I did not touch anything else)
 
 # ── CITY COORDINATES ───────────────────────────────────────────────────────────
 CITIES = {
@@ -122,6 +87,7 @@ ROUTES = [
 ]
 
 def haversine(c1: str, c2: str) -> float:
+    """Real geographic distance in km."""
     lat1, lon1 = CITIES[c1]
     lat2, lon2 = CITIES[c2]
     R = 6371
@@ -129,6 +95,14 @@ def haversine(c1: str, c2: str) -> float:
     dlon = math.radians(lon2 - lon1)
     a = math.sin(dlat/2)**2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon/2)**2
     return R * 2 * math.asin(math.sqrt(a))
+
+def route_cost(frm: str, to: str) -> float:
+    """₹12 per km baseline."""
+    return haversine(frm, to) * 12
+
+def score_risk(base_risk: int) -> int:
+    """Add bounded Gaussian noise to simulate real fluctuation."""
+    return int(np.clip(base_risk + np.random.normal(0, 6), 0, 100))
 
 # ── OPTIMIZATION ENGINE ────────────────────────────────────────────────────────
 def find_best_reroute(frm: str, current_to: str) -> tuple[str, int]:
