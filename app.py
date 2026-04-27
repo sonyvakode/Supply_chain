@@ -37,7 +37,6 @@ except Exception:
     GEMINI_OK = False
 
 
-# ✅ FIXED FUNCTION (ONLY THIS WAS BROKEN)
 def ai_insight(row: pd.Series, cost_saved: float) -> str:
     """Rich Gemini prompt with full shipment context."""
 
@@ -139,7 +138,7 @@ def route_cost(frm: str, to: str) -> float:
 def score_risk(base_risk: int) -> int:
     return int(np.clip(base_risk + np.random.normal(0, 6), 0, 100))
 
-# ── REST OF YOUR ORIGINAL CODE CONTINUES EXACTLY SAME (UNCHANGED) ──
+
 # ── OPTIMIZATION ENGINE ────────────────────────────────────────────────────────
 def find_best_reroute(frm: str, current_to: str) -> tuple[str, int]:
     """
