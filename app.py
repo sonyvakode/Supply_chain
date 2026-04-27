@@ -57,11 +57,39 @@ def ai_insight(row: pd.Series, cost_saved: float) -> str:
         f"Network Cost Saved After Optimization: ₹{cost_saved:.0f}\n\n"
         f"Be specific about this route and risk level. No generic advice."
     )
-    try:
-        res = gemini.generate_content(prompt)
-        return res.text
-    except Exception as e:
-        return f"• AI temporarily unavailable: {e}"
+    except Exception:
+    insights = []
+
+    if row["risk"] >= 75:
+        insights.append(
+            f"• Critical disruption risk ({row['risk']}%) on {row['from'].title()} → {row['to'].title()} route. Immediate rerouting required."
+        )
+    elif row["risk"] >= 50:
+        insights.append(
+            f"• Elevated risk ({row['risk']}). Proactive monitoring needed."
+        )
+    else:
+        insights.append(
+            f"• Low risk ({row['risk']}). Route is stable."
+        )
+
+    if row["delay"] >= 6:
+        insights.append(
+            f"• High delay risk ({row['delay']} days) may impact supply commitments."
+        )
+    elif row["delay"] >= 3:
+        insights.append(
+            f"• Moderate delay expected ({row['delay']} days)."
+        )
+    else:
+        insights.append(
+            f"• Delivery on schedule (ETA {row['eta']} days)."
+        )
+
+    if cost_saved > 0 and row["risk"] >= 50:
+        insights[1] = f"• Optimization can save ₹{int(cost_saved)} and reduce risk."
+
+    return "\n".join(insights[:2])
 
 # ── CITY COORDINATES ───────────────────────────────────────────────────────────
 CITIES = {
