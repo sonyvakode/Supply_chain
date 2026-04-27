@@ -6,72 +6,72 @@ import streamlit as st
 import random
 import math
 import time
-import google.generativeai as genai
-from sklearn.linear_model import LinearRegression
 
-st.set_page_config(page_title="ChainGuard", layout="wide", page_icon="🚚")
-
-# ── GEMINI SETUP ─────────────────────────────────────────
+# OPTIONAL Gemini (will silently fail if no quota)
 try:
-    genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+    import google.generativeai as genai
+    genai.configure(api_key=st.secrets.get("GEMINI_API_KEY", ""))
     gemini = genai.GenerativeModel("gemini-2.0-flash")
     GEMINI_OK = True
 except:
     GEMINI_OK = False
 
-# ── SMART AI INSIGHT (UPDATED) ───────────────────────────
+st.set_page_config(page_title="ChainGuard AI", layout="wide", page_icon="🚚")
+
+# ── AI INSIGHT ENGINE (HYBRID) ─────────────────────────────
 def ai_insight(row: pd.Series, cost_saved: float) -> str:
-    if not GEMINI_OK:
-        insights = []
+    # Try Gemini (will silently fail if quota exceeded)
+    if GEMINI_OK:
+        try:
+            prompt = f"""
+            Analyze shipment:
+            Route: {row['from']} → {row['to']}
+            Risk: {row['risk']}
+            Delay: {row['delay']}
+            Cost: ₹{row['cost']}
 
-        # Risk logic
-        if row["risk"] >= 70:
-            insights.append(
-                f"• High disruption risk ({row['risk']}%). Immediate rerouting or contingency planning required."
-            )
-        elif row["risk"] >= 40:
-            insights.append(
-                f"• Moderate risk detected on {row['from']} → {row['to']}. Monitor closely for delays."
-            )
-        else:
-            insights.append(
-                f"• Stable route with low risk ({row['risk']}%). No intervention needed."
-            )
+            Give exactly 2 short actionable insights.
+            """
+            res = gemini.generate_content(prompt)
+            return res.text
+        except:
+            pass  # ⛔ hide API errors completely
 
-        # Delay logic
-        if row["delay"] >= 5:
-            insights.append(
-                f"• Delay of {row['delay']} days may impact delivery commitments."
-            )
-        else:
-            insights.append(
-                f"• ETA of {row['eta']} days is within acceptable limits."
-            )
+    # ── SMART LOCAL AI (fallback) ──
+    insights = []
 
-        # Cost optimization
-        if cost_saved > 0:
-            insights.append(
-                f"• Potential savings: ₹{int(cost_saved)} via optimized routing."
-            )
+    # Risk logic
+    if row["risk"] >= 70:
+        insights.append(
+            f"• High disruption risk ({row['risk']}%). Immediate rerouting or contingency planning required."
+        )
+    elif row["risk"] >= 40:
+        insights.append(
+            f"• Moderate risk on {row['from']} → {row['to']}. Monitor closely for delays."
+        )
+    else:
+        insights.append(
+            f"• Stable route with low risk ({row['risk']}%). No intervention needed."
+        )
 
-        return "\n".join(insights[:2])
+    # Delay logic
+    if row["delay"] >= 5:
+        insights.append(
+            f"• Delay of {row['delay']} days may impact delivery commitments."
+        )
+    else:
+        insights.append(
+            f"• ETA {row['eta']} days is within acceptable limits."
+        )
 
-    # REAL AI (if API works)
-    prompt = f"""
-    Analyze shipment:
-    Route: {row['from']} → {row['to']}
-    Risk: {row['risk']}
-    Delay: {row['delay']}
-    Cost: ₹{row['cost']}
+    # Cost logic
+    if cost_saved > 0:
+        insights.append(
+            f"• Optimization opportunity: Save approx ₹{int(cost_saved)}."
+        )
 
-    Give 2 short actionable insights.
-    """
+    return "\n".join(insights[:2])
 
-    try:
-        res = gemini.generate_content(prompt)
-        return res.text
-    except:
-        return "• Insight temporarily unavailable."
 
 # ── DATA ─────────────────────────────────────────
 CITIES = {
@@ -87,6 +87,7 @@ ROUTES = [
     ("mumbai", "delhi"),
     ("chennai", "bangalore"),
     ("hyderabad", "pune"),
+    ("bangalore", "hyderabad"),
 ]
 
 def haversine(c1, c2):
@@ -101,13 +102,19 @@ def haversine(c1, c2):
 def route_cost(frm, to):
     return haversine(frm, to) * 12
 
-# ── DATA GENERATION ─────────────────────────────────
-def build_dataframe():
+
+# ── DATA GENERATION ─────────────────────────────
+def build_dataframe(n=12):
     rows = []
-    for i in range(10):
+    for i in range(n):
         frm, to = random.choice(ROUTES)
         risk = random.randint(10, 95)
-        rows.append({"id": f"SHP-{1000+i}", "from": frm, "to": to, "risk": risk})
+        rows.append({
+            "id": f"SHP-{1000+i}",
+            "from": frm,
+            "to": to,
+            "risk": risk
+        })
     return pd.DataFrame(rows)
 
 def enrich(df):
@@ -115,40 +122,95 @@ def enrich(df):
     df["delay"] = (df["risk"] // 10)
     df["eta"] = df["delay"] + 5
     df["cost"] = df.apply(lambda r: route_cost(r["from"], r["to"]), axis=1)
-    df["status"] = np.where(df["risk"] > 60, "CRITICAL",
-                   np.where(df["risk"] > 30, "AT RISK", "SAFE"))
+
+    df["status"] = np.where(df["risk"] >= 60, "CRITICAL",
+                   np.where(df["risk"] >= 30, "AT RISK", "ON TRACK"))
     return df
 
-# ── INIT ─────────────────────────────────────────
+
+# ── SESSION STATE ─────────────────────────────
 if "df" not in st.session_state:
     st.session_state.df = build_dataframe()
 
 df = enrich(st.session_state.df)
 
-# ── UI ─────────────────────────────────────────
+# ── HEADER ─────────────────────────────────────
 st.title("🚚 ChainGuard AI")
-st.caption("Offline AI Simulation + Real Optimization")
+st.caption("AI-Powered Supply Chain Optimization · Hybrid Intelligence Engine")
 
-st.metric("Total Shipments", len(df))
+# ── KPI ────────────────────────────────────────
+col1, col2, col3 = st.columns(3)
+col1.metric("Total Shipments", len(df))
+col2.metric("Critical", int((df["risk"] >= 60).sum()))
+col3.metric("Avg Risk", f"{df['risk'].mean():.1f}")
 
-# ── TABLE ───────────────────────────────────────
-cost_saved = 5000  # demo constant
+st.divider()
+
+# ── MAP ────────────────────────────────────────
+st.subheader("🌍 Network Map")
+
+lines = []
+for _, row in df.iterrows():
+    f_lat, f_lon = CITIES[row["from"]]
+    t_lat, t_lon = CITIES[row["to"]]
+
+    color = (
+        [255, 75, 75, 200] if row["status"] == "CRITICAL" else
+        [255, 165, 0, 180] if row["status"] == "AT RISK" else
+        [0, 200, 130, 150]
+    )
+
+    lines.append({
+        "from": [f_lon, f_lat],
+        "to": [t_lon, t_lat],
+        "color": color
+    })
+
+st.pydeck_chart(pdk.Deck(
+    map_style="mapbox://styles/mapbox/dark-v10",
+    initial_view_state=pdk.ViewState(latitude=20, longitude=78, zoom=4),
+    layers=[
+        pdk.Layer(
+            "LineLayer",
+            data=lines,
+            get_source_position="from",
+            get_target_position="to",
+            get_color="color",
+            get_width=3
+        )
+    ]
+))
+
+st.divider()
+
+# ── SHIPMENTS ──────────────────────────────────
+st.subheader("📦 Shipment Insights")
+
+cost_saved_demo = 5000  # demo value
 
 for i, row in df.iterrows():
-    cols = st.columns([2,2,1,1,2])
+    cols = st.columns([1.5, 2.5, 1, 1, 1.5])
 
-    cols[0].write(row["id"])
+    cols[0].write(f"**{row['id']}**")
     cols[1].write(f"{row['from']} → {row['to']}")
     cols[2].write(row["status"])
     cols[3].write(f"{row['risk']}%")
 
     if cols[4].button("🧠 AI Insight", key=i):
-        st.info("🧠 AI Insight (Local Engine)")
-        st.write(ai_insight(row, cost_saved))
+        st.info("🧠 AI Insight (Hybrid Engine)")
+        st.write(ai_insight(row, cost_saved_demo))
 
-# ── SIMPLE CHART ────────────────────────────────
+st.divider()
+
+# ── CHART ──────────────────────────────────────
 st.subheader("📊 Risk Distribution")
 
 fig, ax = plt.subplots()
 ax.hist(df["risk"], bins=10)
 st.pyplot(fig)
+
+# ── AUTO REFRESH (optional demo) ───────────────
+if st.toggle("🔄 Live Simulation"):
+    time.sleep(3)
+    st.session_state.df = build_dataframe()
+    st.rerun()
