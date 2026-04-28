@@ -26,7 +26,7 @@ It delivers a **real-time simulation dashboard** with:
   https://smartsupplychain.streamlit.app/
 
 * **Demo Video (3 Minutes):**
-  https://youtube.com/smartflow-ai-demo
+(https://youtu.be/WjTeBdOSk4I?si=igQC9HjwREMV5KQk)
 
 ---
 
